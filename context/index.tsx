@@ -22,9 +22,9 @@ if (!projectId) {
 
 // Set up metadata
 const metadata = {
-    name: 'honk-test.vercel.app',
-    description: 'AppKit Example',
-    url: 'https://https://honk-test.vercel.app', // origin must match your domain & subdomain
+    name: 'honkbridge',
+    description: 'Honkbridge',
+    url: 'https://honkbridge.io', // origin must match your domain & subdomain
     icons: ['https://avatars.githubusercontent.com/u/179229932']
 }
 
@@ -36,6 +36,9 @@ const modal = createAppKit({
     defaultNetwork: mainnet,
     metadata: metadata,
     features: {
+        email: false,
+        socials: [],
+        emailShowWallets: false,
         analytics: true // Optional - defaults to your Cloud configuration
     }
 })
