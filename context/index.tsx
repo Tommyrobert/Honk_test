@@ -22,9 +22,9 @@ if (!projectId) {
 
 // Set up metadata
 const metadata = {
-    name: 'appkit-example',
+    name: 'honk-test.vercel.app',
     description: 'AppKit Example',
-    url: 'https://https://honk-test.vercel.app/', // origin must match your domain & subdomain
+    url: 'https://https://honk-test.vercel.app', // origin must match your domain & subdomain
     icons: ['https://avatars.githubusercontent.com/u/179229932']
 }
 
