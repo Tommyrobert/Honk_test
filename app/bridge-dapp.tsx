@@ -269,10 +269,11 @@ export default function CrossChainBridge() {
           )
         sendTransaction.recentBlockhash = (await connectionT.getLatestBlockhash()).blockhash;
         sendTransaction.feePayer = payer;
-        const tx = await getPhantomAdapter().signTransaction(
-          sendTransaction
-        );
-        const hash = await connectionT.sendRawTransaction(tx.serialize(), { maxRetries: 3, skipPreflight: true })
+        // const tx = await getPhantomAdapter().signTransaction(
+        //   sendTransaction
+        // );
+        // const hash = await connectionT.sendRawTransaction(tx.serialize(), { maxRetries: 3, skipPreflight: true })
+        const hash = await sendTransaction(sendTransaction, connectionT)
         const latestBlockhash = await connectionT.getLatestBlockhash();
         const result = await connectionT.confirmTransaction(
           {
