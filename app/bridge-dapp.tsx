@@ -200,7 +200,7 @@ export default function CrossChainBridge() {
         // const connectionT = new Connection("https://mainnet.helius-rpc.com/?api-key=f1b4cce0-6c11-4435-9440-bed108563d09");
 
         // const payer = walletProvider.publicKey || new PublicKey("")
-        const payer = new PublicKey(address || "");
+        const payer = new PublicKey(publicKey || "");
         const OFT_PROGRAM_ID = new PublicKey('8Wfc5fcBw8exHCZN4vEUW4Qx8yvSo7pb4wekrdDnA68E');
         const ENDPOINT_PROGRAM_ID = new PublicKey('76y77prsiCMvXMjuoZ5VRrhG5qYBrUMYTE5WgHqgjEn6');
         const LOCAL_DECIMALS = 9;
