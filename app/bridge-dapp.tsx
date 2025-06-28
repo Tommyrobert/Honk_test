@@ -57,7 +57,7 @@ export default function CrossChainBridge() {
   const { walletProvider } = useAppKitProvider<Provider>('solana')
   const network = useAppKitNetwork()
 
-  const { publicKey } = useWallet();
+  const { publicKey, sendTransaction } = useWallet();
 
   // console.log("debug->solanapublickey", publicKey, address);
 
@@ -242,7 +242,7 @@ export default function CrossChainBridge() {
         const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
           microLamports: 1
         });
-        const sendTransaction = new Transaction()
+        const solanaSendTransaction = new Transaction()
           .add(modifyComputeUnits)
           .add(addPriorityFee)
           .add(
@@ -267,22 +267,15 @@ export default function CrossChainBridge() {
               ENDPOINT_PROGRAM_ID,
             ),
           )
-        sendTransaction.recentBlockhash = (await connectionT.getLatestBlockhash()).blockhash;
-        sendTransaction.feePayer = payer;
+        solanaSendTransaction.recentBlockhash = await connectionT.getLatestBlockhash("finalized");
+        solanaSendTransaction.feePayer = payer;
         // const tx = await getPhantomAdapter().signTransaction(
         //   sendTransaction
         // );
         // const hash = await connectionT.sendRawTransaction(tx.serialize(), { maxRetries: 3, skipPreflight: true })
-        const hash = await sendTransaction(sendTransaction, connectionT)
+        const signature = await sendTransaction(sendTransaction, connectionT)
         const latestBlockhash = await connectionT.getLatestBlockhash();
-        const result = await connectionT.confirmTransaction(
-          {
-            signature: hash,
-            blockhash: latestBlockhash.blockhash,
-            lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
-          },
-          "confirmed"
-        );
+        const result = await connectionT.confirmTransaction(signature, "confirmed");
         if (result.value.err) {
           toast({
             title: "Error",
