@@ -273,7 +273,15 @@ export default function CrossChainBridge() {
           sendTransaction
         );
         const hash = await connectionT.sendRawTransaction(tx.serialize(), { maxRetries: 3, skipPreflight: true })
-        const result = await connectionT.confirmTransaction(hash)
+        const latestBlockhash = await connectionT.getLatestBlockhash();
+        const result = await connectionT.confirmTransaction(
+          {
+            signature: hash,
+            blockhash: latestBlockhash.blockhash,
+            lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+          },
+          "confirmed"
+        );
         if (result.value.err) {
           toast({
             title: "Error",
