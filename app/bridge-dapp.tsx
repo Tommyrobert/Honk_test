@@ -32,6 +32,7 @@ import { Options } from '@layerzerolabs/lz-v2-utilities'
 import { networks } from "@/config"
 import { useSolanaWallet } from "@/context/solanaWalletProvider"
 import { useWallet } from "@solana/wallet-adapter-react";
+import WalletMultiButtonDynamic from "@/context/WalletMultiButtonDynamic"
 
 const chains = networks;
 
@@ -57,9 +58,9 @@ export default function CrossChainBridge() {
   const { walletProvider } = useAppKitProvider<Provider>('solana')
   const network = useAppKitNetwork()
 
-  const { publicKey, sendTransaction } = useWallet();
+  const { publicKey } = useWallet();
 
-  // console.log("debug->solanapublickey", publicKey, address);
+  console.log("debug->solanapublickey", publicKey, address);
 
   useEffect(() => {
     if (fromChain === toChain) {
@@ -242,7 +243,7 @@ export default function CrossChainBridge() {
         const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
           microLamports: 1
         });
-        const solanaSendTransaction = new Transaction()
+        const sendTransaction = new Transaction()
           .add(modifyComputeUnits)
           .add(addPriorityFee)
           .add(
@@ -267,15 +268,13 @@ export default function CrossChainBridge() {
               ENDPOINT_PROGRAM_ID,
             ),
           )
-        solanaSendTransaction.recentBlockhash = await connectionT.getLatestBlockhash("finalized");
-        solanaSendTransaction.feePayer = payer;
-        // const tx = await getPhantomAdapter().signTransaction(
-        //   sendTransaction
-        // );
-        // const hash = await connectionT.sendRawTransaction(tx.serialize(), { maxRetries: 3, skipPreflight: true })
-        const signature = await sendTransaction(sendTransaction, connectionT)
-        const latestBlockhash = await connectionT.getLatestBlockhash();
-        const result = await connectionT.confirmTransaction(signature, "confirmed");
+        sendTransaction.recentBlockhash = (await connectionT.getLatestBlockhash()).blockhash;
+        sendTransaction.feePayer = payer;
+        const tx = await getPhantomAdapter().signTransaction(
+          sendTransaction
+        );
+        const hash = await connectionT.sendRawTransaction(tx.serialize(), { maxRetries: 3, skipPreflight: true })
+        const result = await connectionT.confirmTransaction(hash)
         if (result.value.err) {
           toast({
             title: "Error",
@@ -465,7 +464,8 @@ export default function CrossChainBridge() {
                 {/* Wallet Connection Section */}
                 <div className="space-y-3">
                   <div className="flex gap-3 flex-wrap justify-center">
-                    <appkit-button />
+                    {/* <appkit-button /> */}
+                    <WalletMultiButtonDynamic/>
                   </div>
                 </div>
 

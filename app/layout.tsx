@@ -9,6 +9,8 @@ import { cookies, headers } from 'next/headers' // added
 import ContextProvider from '@/context'
 import { Toaster } from '@/components/ui/toaster';
 import { SolanaProvider } from "@/context/solanaWalletProvider";
+// import { createNetworkConfig, SuiClientProvider, WalletProvider as SuiWalletProvider/*, lightTheme*/, DynamicTheme } from "@mysten/dapp-kit";
+import { WalletConnectProvider } from '@/context/WalletConnectProvider';
 
 export const metadata: Metadata = {
   title: 'Honk Bridge',
@@ -17,26 +19,7 @@ export const metadata: Metadata = {
   icons: {
     icon: '/image/favicon.png',
   }
-}
-
-// export default async function RootLayout({
-//   children,
-// }: Readonly<{
-//   children: React.ReactNode
-// }>) {
-//   const headersObj = await headers();
-//   const cookies = headersObj.get('cookie')
-//   return (
-//     <html lang="en">
-//       <body>
-//         <ContextProvider cookies={cookies}>
-//           {children}
-//         </ContextProvider>
-//         <Toaster />
-//       </body>
-//     </html>
-//   )
-// }
+};
 
 export default async function RootLayout({
   children
@@ -48,11 +31,11 @@ export default async function RootLayout({
   return (
     <html>
       <body>
-        <SolanaProvider>
+        <WalletConnectProvider>
           <ContextProvider cookies={cookies}>
             {children}
           </ContextProvider>
-        </SolanaProvider>
+        </WalletConnectProvider>
       </body>
     </html>
   );
