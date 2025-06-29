@@ -32,9 +32,9 @@ export default async function RootLayout({
     <html>
       <body>
         <WalletConnectProvider>
-          <ContextProvider cookies={cookies}>
+          {/* <ContextProvider cookies={cookies}> */}
             {children}
-          </ContextProvider>
+          {/* </ContextProvider> */}
         </WalletConnectProvider>
       </body>
     </html>
