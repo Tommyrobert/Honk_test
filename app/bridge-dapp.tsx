@@ -32,7 +32,6 @@ import { Options } from '@layerzerolabs/lz-v2-utilities'
 import { networks } from "@/config"
 import { useSolanaWallet } from "@/context/solanaWalletProvider"
 import { useWallet } from "@solana/wallet-adapter-react";
-import WalletMultiButtonDynamic from "@/context/WalletMultiButtonDynamic"
 
 const chains = networks;
 
@@ -60,7 +59,7 @@ export default function CrossChainBridge() {
 
   const { publicKey } = useWallet();
 
-  console.log("debug->solanapublickey", publicKey?.toString(), address);
+  // console.log("debug->solanapublickey", publicKey, address);
 
   useEffect(() => {
     if (fromChain === toChain) {
@@ -87,49 +86,45 @@ export default function CrossChainBridge() {
 
   useEffect(() => {
     setFromChain(network.chainId)
-  }, [network])
-  // const peer = useMemo(() => {
-  //   if (toChain == sepolia.id) {
-  //     return {
-  //       dstEid: 40161,
-  //       peerAddress: addressToBytes32('0x966D12C6cA09341cE49E9C04C103711fa63013B4')
-  //     }
-  //   } else if (toChain == mainnet.id) {
-  //     return {
-  //       dstEid: 30101,
-  //       peerAddress: addressToBytes32('0x6612c68a32Ce2b5F38f0729A4f0F0521DEE84675')
-  //     }
-  //   } else if (toChain == bsc.id) {
-  //     return {
-  //       dstEid: 30102,
-  //       peerAddress: addressToBytes32('0x6612c68a32Ce2b5F38f0729A4f0F0521DEE84675')
-  //     }
-  //   } else if (toChain == arbitrum.id) {
-  //     return {
-  //       dstEid: 30110,
-  //       peerAddress: addressToBytes32('0x6612c68a32Ce2b5F38f0729A4f0F0521DEE84675')
-  //     }
-  //   } else if (toChain == base.id) {
-  //     return {
-  //       dstEid: 30184,
-  //       peerAddress: addressToBytes32('0x6612c68a32Ce2b5F38f0729A4f0F0521DEE84675')
-  //     }
-  //   } else if (toChain == polygon.id) {
-  //     return {
-  //       dstEid: 30109,
-  //       peerAddress: addressToBytes32('0x6612c68a32Ce2b5F38f0729A4f0F0521DEE84675')
-  //     }
-  //   }
-  //   return {
-  //     dstEid: 30102,
-  //     peerAddress: addressToBytes32('0x6612c68a32Ce2b5F38f0729A4f0F0521DEE84675')
-  //   }
-  // }, [toChain])
+  }, [network, network.chainId])
+  const peer = useMemo(() => {
+    if (toChain == sepolia.id) {
+      return {
+        dstEid: 40161,
+        peerAddress: addressToBytes32('0x966D12C6cA09341cE49E9C04C103711fa63013B4')
+      }
+    } else if (toChain == mainnet.id) {
+      return {
+        dstEid: 30101,
+        peerAddress: addressToBytes32('0x6612c68a32Ce2b5F38f0729A4f0F0521DEE84675')
+      }
+    } else if (toChain == bsc.id) {
+      return {
+        dstEid: 30102,
+        peerAddress: addressToBytes32('0x6612c68a32Ce2b5F38f0729A4f0F0521DEE84675')
+      }
+    } else if (toChain == arbitrum.id) {
+      return {
+        dstEid: 30110,
+        peerAddress: addressToBytes32('0x6612c68a32Ce2b5F38f0729A4f0F0521DEE84675')
+      }
+    } else if (toChain == base.id) {
+      return {
+        dstEid: 30184,
+        peerAddress: addressToBytes32('0x6612c68a32Ce2b5F38f0729A4f0F0521DEE84675')
+      }
+    } else if (toChain == polygon.id) {
+      return {
+        dstEid: 30109,
+        peerAddress: addressToBytes32('0x6612c68a32Ce2b5F38f0729A4f0F0521DEE84675')
+      }
+    }
+    return {
+      dstEid: 30102,
+      peerAddress: addressToBytes32('0x6612c68a32Ce2b5F38f0729A4f0F0521DEE84675')
+    }
+  }, [toChain])
 
-  const peer = {
-    dstEid: 30102, // Default to BSC
-    peerAddress: addressToBytes32('0x6612c68a32Ce2b5F38f0729A4f0F0521DEE84675')
-  }
 
   const handleSwapChains = () => {
     const temp = fromChain
@@ -152,225 +147,150 @@ export default function CrossChainBridge() {
 
       const destinationAddress32 = Array.from(addressToBytes32(destinationAddress)).map(byte => byte.toString(16).padStart(2, '0')).join('');
       await new Promise((resolve) => setTimeout(resolve, 1500))
-      // if (fromChain != solana.id) {
-      //   let sendParam = [];
-      //   //@ts-ignore
-      //   sendParam.push(ENDPOINTS[toChain]);
-      //   sendParam.push('0x' + destinationAddress32);
-      //   sendParam.push('' + BigInt(parseFloat(amount) * (10 ** 18)));
-      //   sendParam.push('' + BigInt(parseFloat(amount) * (10 ** 18)));
-      //   sendParam.push('0x');
-      //   sendParam.push('0x');
-      //   sendParam.push('0x');
-      //   const quoteResult: any = await readContract(config as any, {
-      //     abi,
-      //     // @ts-ignore
-      //     address: TOKENS[fromChain],
-      //     functionName: 'quoteSend',
-      //     args: [sendParam, false],
-      //     chainId: fromChain
-      //   })
-      //   const hash = await writeContract(config as any, {
-      //     //@ts-ignore
-      //     address: TOKENS[fromChain],
-      //     abi: abi,
-      //     functionName: "send",
-      //     args: [sendParam, ['' + quoteResult?.nativeFee, '0'], address],
-      //     value: BigInt(quoteResult?.nativeFee ?? 0),
-      //     chainId: fromChain
-      //   });
-      //   const result = await waitForTransactionReceipt(config, { hash });
+      if (fromChain != solana.id) {
+        let sendParam = [];
+        //@ts-ignore
+        sendParam.push(ENDPOINTS[toChain]);
+        sendParam.push('0x' + destinationAddress32);
+        sendParam.push('' + BigInt(parseFloat(amount) * (10 ** 18)));
+        sendParam.push('' + BigInt(parseFloat(amount) * (10 ** 18)));
+        sendParam.push('0x');
+        sendParam.push('0x');
+        sendParam.push('0x');
+        const quoteResult: any = await readContract(config as any, {
+          abi,
+          // @ts-ignore
+          address: TOKENS[fromChain],
+          functionName: 'quoteSend',
+          args: [sendParam, false],
+          chainId: fromChain
+        })
+        const hash = await writeContract(config as any, {
+          //@ts-ignore
+          address: TOKENS[fromChain],
+          abi: abi,
+          functionName: "send",
+          args: [sendParam, ['' + quoteResult?.nativeFee, '0'], address],
+          value: BigInt(quoteResult?.nativeFee ?? 0),
+          chainId: fromChain
+        });
+        const result = await waitForTransactionReceipt(config, { hash });
 
-      //   setIsBridging(false);
-      //   setAmount("")
-      //   setDestinationAddress("")
+        setIsBridging(false);
+        setAmount("")
+        setDestinationAddress("")
 
-      //   if (result.status === 'success') {
-      //     toast({
-      //       title: "Bridge Complete",
-      //       description: `Successfully bridged ${amount} HONK!`,
-      //     })
-      //   } else {
-      //     toast({
-      //       title: "Error",
-      //       description: "Tranaction is failed",
-      //       variant: "destructive",
-      //     })
-      //   }
-      // } else {
-      //   // if (!walletProvider) return
-      //   // const connectionT = new Connection("https://mainnet.helius-rpc.com/?api-key=c471ca87-a59f-4c9e-a748-243ed59a55b0");
-      //   // const connectionT = new Connection("https://mainnet.helius-rpc.com/?api-key=8a542575-72ec-4529-b0eb-9ad3c840c637");
-      //   const connectionT = new Connection("https://mainnet.helius-rpc.com/?api-key=b5064b11-553d-464e-a03d-58198591aa33");
-      //   // const connectionT = new Connection("https://mainnet.helius-rpc.com/?api-key=f1b4cce0-6c11-4435-9440-bed108563d09");
+        if (result.status === 'success') {
+          toast({
+            title: "Bridge Complete",
+            description: `Successfully bridged ${amount} HONK!`,
+          })
+        } else {
+          toast({
+            title: "Error",
+            description: "Tranaction is failed",
+            variant: "destructive",
+          })
+        }
+      } else {
+        // if (!walletProvider) return
+        // const connectionT = new Connection("https://mainnet.helius-rpc.com/?api-key=c471ca87-a59f-4c9e-a748-243ed59a55b0");
+        // const connectionT = new Connection("https://mainnet.helius-rpc.com/?api-key=8a542575-72ec-4529-b0eb-9ad3c840c637");
+        const connectionT = new Connection("https://mainnet.helius-rpc.com/?api-key=b5064b11-553d-464e-a03d-58198591aa33");
+        // const connectionT = new Connection("https://mainnet.helius-rpc.com/?api-key=f1b4cce0-6c11-4435-9440-bed108563d09");
 
-      //   // const payer = walletProvider.publicKey || new PublicKey("")
-      //   const payer = new PublicKey(publicKey?.toString() || "");
-      //   const OFT_PROGRAM_ID = new PublicKey('8Wfc5fcBw8exHCZN4vEUW4Qx8yvSo7pb4wekrdDnA68E');
-      //   const ENDPOINT_PROGRAM_ID = new PublicKey('76y77prsiCMvXMjuoZ5VRrhG5qYBrUMYTE5WgHqgjEn6');
-      //   const LOCAL_DECIMALS = 9;
+        // const payer = walletProvider.publicKey || new PublicKey("")
+        const payer = new PublicKey(address || "");
+        const OFT_PROGRAM_ID = new PublicKey('8Wfc5fcBw8exHCZN4vEUW4Qx8yvSo7pb4wekrdDnA68E');
+        const ENDPOINT_PROGRAM_ID = new PublicKey('76y77prsiCMvXMjuoZ5VRrhG5qYBrUMYTE5WgHqgjEn6');
+        const LOCAL_DECIMALS = 9;
 
-      //   const mintKp = new PublicKey("3ag1Mj9AKz9FAkCQ6gAEhpLSX8B2pUbPdkb9iBsDLZNB");
-      //   const lockBox = Keypair.fromSecretKey(Uint8Array.from(bs58.decode
-      //     ('3Pv4sAofWPZDpgEnqbN4qX6hkQTVzotV3YCPdBMS3TUaxMXkNmU5cYQ4pitBzshhyj4tmWVZ5qDEz4T8GrnLhPvr')));
-      //   const receiver = addressToBytes32(destinationAddress);
+        const mintKp = new PublicKey("3ag1Mj9AKz9FAkCQ6gAEhpLSX8B2pUbPdkb9iBsDLZNB");
+        const lockBox = Keypair.fromSecretKey(Uint8Array.from(bs58.decode
+          ('3Pv4sAofWPZDpgEnqbN4qX6hkQTVzotV3YCPdBMS3TUaxMXkNmU5cYQ4pitBzshhyj4tmWVZ5qDEz4T8GrnLhPvr')));
+        const receiver = addressToBytes32(destinationAddress);
 
-      //   const amountToSend = BigInt(parseFloat(amount) * (10 ** LOCAL_DECIMALS));
+        const amountToSend = BigInt(parseFloat(amount) * (10 ** LOCAL_DECIMALS));
 
-      //   const [associatedTokenAccount] = PublicKey.findProgramAddressSync(
-      //     [payer.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mintKp.toBuffer()],
-      //     ASSOCIATED_TOKEN_PROGRAM_ID
-      //   );
+        const [associatedTokenAccount] = PublicKey.findProgramAddressSync(
+          [payer.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mintKp.toBuffer()],
+          ASSOCIATED_TOKEN_PROGRAM_ID
+        );
 
-      //   const fee = await OftTools.quoteWithUln(
-      //     connectionT,
-      //     payer, // the payer's address
-      //     mintKp, // your token mint account
-      //     peer.dstEid, // the dstEid
-      //     amountToSend, // the amount of tokens to send
-      //     amountToSend, // the minimum amount of tokens to send (for slippage)
-      //     Options.newOptions().addExecutorLzReceiveOption(200000, 0).toBytes(), // any extra execution options to add on top of enforced
-      //     Array.from(receiver), // the receiver's address in bytes32
-      //     false,
-      //     lockBox.publicKey,
-      //     undefined,
-      //     Array.from(peer.peerAddress),
-      //     undefined,
-      //     TOKEN_PROGRAM_ID,
-      //     OFT_PROGRAM_ID,
-      //     undefined,
-      //     ENDPOINT_PROGRAM_ID
-      //   );
-      //   const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
-      //     units: 1000000
-      //   });
-      //   const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      //     microLamports: 1
-      //   });
-      //   const sendTransaction = new Transaction()
-      //     .add(modifyComputeUnits)
-      //     .add(addPriorityFee)
-      //     .add(
-      //       await OftTools.sendWithUln(
-      //         connectionT, // your connection
-      //         payer, // payer address
-      //         mintKp, // token mint address
-      //         associatedTokenAccount,
-      //         peer.dstEid, // destination endpoint id
-      //         amountToSend, // amount of tokens to send
-      //         amountToSend, // minimum amount of tokens to send (for slippage)
-      //         Options.newOptions().addExecutorLzReceiveOption(200000, 0).toBytes(), // extra options to send
-      //         Array.from(receiver), // receiver address
-      //         fee.nativeFee, // native fee to pay (using quote)
-      //         undefined,
-      //         lockBox.publicKey,
-      //         undefined,
-      //         Array.from(peer.peerAddress),
-      //         undefined,
-      //         undefined,
-      //         OFT_PROGRAM_ID,
-      //         ENDPOINT_PROGRAM_ID,
-      //       ),
-      //     )
-      //   sendTransaction.recentBlockhash = (await connectionT.getLatestBlockhash()).blockhash;
-      //   sendTransaction.feePayer = payer;
-      //   const tx = await getPhantomAdapter().signTransaction(
-      //     sendTransaction
-      //   );
-      //   const hash = await connectionT.sendRawTransaction(tx.serialize(), { maxRetries: 3, skipPreflight: true })
-      //   const result = await connectionT.confirmTransaction(hash)
-      //   if (result.value.err) {
-      //     toast({
-      //       title: "Error",
-      //       description: "Tranaction is failed",
-      //       variant: "destructive",
-      //     })
-      //   } else {
-      //     toast({
-      //       title: "Bridge Complete",
-      //       description: `Successfully bridged ${amount} HONK!`,
-      //     })
-      //   }
-      // }
+        const fee = await OftTools.quoteWithUln(
+          connectionT,
+          payer, // the payer's address
+          mintKp, // your token mint account
+          peer.dstEid, // the dstEid
+          amountToSend, // the amount of tokens to send
+          amountToSend, // the minimum amount of tokens to send (for slippage)
+          Options.newOptions().addExecutorLzReceiveOption(200000, 0).toBytes(), // any extra execution options to add on top of enforced
+          Array.from(receiver), // the receiver's address in bytes32
+          false,
+          lockBox.publicKey,
+          undefined,
+          Array.from(peer.peerAddress),
+          undefined,
+          TOKEN_PROGRAM_ID,
+          OFT_PROGRAM_ID,
+          undefined,
+          ENDPOINT_PROGRAM_ID
+        );
+        const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+          units: 1000000
+        });
+        const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+          microLamports: 1
+        });
+        const sendTransaction = new Transaction()
+          .add(modifyComputeUnits)
+          .add(addPriorityFee)
+          .add(
+            await OftTools.sendWithUln(
+              connectionT, // your connection
+              payer, // payer address
+              mintKp, // token mint address
+              associatedTokenAccount,
+              peer.dstEid, // destination endpoint id
+              amountToSend, // amount of tokens to send
+              amountToSend, // minimum amount of tokens to send (for slippage)
+              Options.newOptions().addExecutorLzReceiveOption(200000, 0).toBytes(), // extra options to send
+              Array.from(receiver), // receiver address
+              fee.nativeFee, // native fee to pay (using quote)
+              undefined,
+              lockBox.publicKey,
+              undefined,
+              Array.from(peer.peerAddress),
+              undefined,
+              undefined,
+              OFT_PROGRAM_ID,
+              ENDPOINT_PROGRAM_ID,
+            ),
+          )
+        sendTransaction.recentBlockhash = (await connectionT.getLatestBlockhash()).blockhash;
+        sendTransaction.feePayer = payer;
+        // const tx = await getPhantomAdapter().signTransaction(
+        //   sendTransaction
+        // );
+        // const hash = await connectionT.sendRawTransaction(tx.serialize(), { maxRetries: 3, skipPreflight: true })
+        const rehash = await getPhantomAdapter().signAndSendTransaction(
+          sendTransaction
+        );
+        const result = await connectionT.confirmTransaction(rehash)
+        if (result.value.err) {
+          toast({
+            title: "Error",
+            description: "Tranaction is failed",
+            variant: "destructive",
+          })
+        } else {
+          toast({
+            title: "Bridge Complete",
+            description: `Successfully bridged ${amount} HONK!`,
+          })
+        }
+      }
 
-      const connectionT = new Connection("https://mainnet.helius-rpc.com/?api-key=b5064b11-553d-464e-a03d-58198591aa33");
-      // const connectionT = new Connection("https://mainnet.helius-rpc.com/?api-key=f1b4cce0-6c11-4435-9440-bed108563d09");
-
-      // const payer = walletProvider.publicKey || new PublicKey("")
-      const payer = new PublicKey(publicKey?.toString() || "");
-      const OFT_PROGRAM_ID = new PublicKey('8Wfc5fcBw8exHCZN4vEUW4Qx8yvSo7pb4wekrdDnA68E');
-      const ENDPOINT_PROGRAM_ID = new PublicKey('76y77prsiCMvXMjuoZ5VRrhG5qYBrUMYTE5WgHqgjEn6');
-      const LOCAL_DECIMALS = 9;
-
-      const mintKp = new PublicKey("3ag1Mj9AKz9FAkCQ6gAEhpLSX8B2pUbPdkb9iBsDLZNB");
-      const lockBox = Keypair.fromSecretKey(Uint8Array.from(bs58.decode
-        ('3Pv4sAofWPZDpgEnqbN4qX6hkQTVzotV3YCPdBMS3TUaxMXkNmU5cYQ4pitBzshhyj4tmWVZ5qDEz4T8GrnLhPvr')));
-      const receiver = addressToBytes32(destinationAddress);
-
-      const amountToSend = BigInt(parseFloat(amount) * (10 ** LOCAL_DECIMALS));
-
-      const [associatedTokenAccount] = PublicKey.findProgramAddressSync(
-        [payer.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mintKp.toBuffer()],
-        ASSOCIATED_TOKEN_PROGRAM_ID
-      );
-
-      const fee = await OftTools.quoteWithUln(
-        connectionT,
-        payer, // the payer's address
-        mintKp, // your token mint account
-        peer.dstEid, // the dstEid
-        amountToSend, // the amount of tokens to send
-        amountToSend, // the minimum amount of tokens to send (for slippage)
-        Options.newOptions().addExecutorLzReceiveOption(200000, 0).toBytes(), // any extra execution options to add on top of enforced
-        Array.from(receiver), // the receiver's address in bytes32
-        false,
-        lockBox.publicKey,
-        undefined,
-        Array.from(peer.peerAddress),
-        undefined,
-        TOKEN_PROGRAM_ID,
-        OFT_PROGRAM_ID,
-        undefined,
-        ENDPOINT_PROGRAM_ID
-      );
-      const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
-        units: 1000000
-      });
-      const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-        microLamports: 1
-      });
-      const sendTransaction = new Transaction()
-        .add(modifyComputeUnits)
-        .add(addPriorityFee)
-        .add(
-          await OftTools.sendWithUln(
-            connectionT, // your connection
-            payer, // payer address
-            mintKp, // token mint address
-            associatedTokenAccount,
-            peer.dstEid, // destination endpoint id
-            amountToSend, // amount of tokens to send
-            amountToSend, // minimum amount of tokens to send (for slippage)
-            Options.newOptions().addExecutorLzReceiveOption(200000, 0).toBytes(), // extra options to send
-            Array.from(receiver), // receiver address
-            fee.nativeFee, // native fee to pay (using quote)
-            undefined,
-            lockBox.publicKey,
-            undefined,
-            Array.from(peer.peerAddress),
-            undefined,
-            undefined,
-            OFT_PROGRAM_ID,
-            ENDPOINT_PROGRAM_ID,
-          ),
-        )
-      sendTransaction.recentBlockhash = (await connectionT.getLatestBlockhash()).blockhash;
-      sendTransaction.feePayer = payer;
-      const tx = await getPhantomAdapter().signTransaction(
-        sendTransaction
-      );
-      const hash = await connectionT.sendRawTransaction(tx.serialize(), { maxRetries: 3, skipPreflight: true })
-      const result = await connectionT.confirmTransaction(hash)
       setIsBridging(false)
       setAmount("")
       setDestinationAddress("")
@@ -391,99 +311,71 @@ export default function CrossChainBridge() {
   //fetch tokenbalance 
   const [tokenBalance, setTokenBalance] = useState<any>(0)
 
-  // useEffect(() => {
-  //   const fetchBalance = async () => {
-  //     try {
-  //       const fromChainChains = chains.filter((chain) => chain.id === fromChain)
-  //       if (fromChainChains.length == 0) return
-  //       if (fromChain !== solana.id) {
-  //         // @ts-ignore
-  //         readContract(config as any, {
-  //           abi,
-  //           // @ts-ignore
-  //           address: TOKENS[fromChain],
-  //           functionName: 'balanceOf',
-  //           args: [address],
-  //           chainId: fromChainChains[0].id
-  //         }).then(bal => {
-  //           setTokenBalance(Number(bal) / 10 ** 18)
-  //         })
-  //       } else {
-  //         // Enable multiple Solana RPC endpoints for redundancy/failover
-  //         const solanaRpcEndpoints = [
-  //           "https://mainnet.helius-rpc.com/?api-key=b5064b11-553d-464e-a03d-58198591aa33",
-  //           // 'https://mainnet.helius-rpc.com/?api-key=c471ca87-a59f-4c9e-a748-243ed59a55b0',
-  //           // 'https://api.mainnet-beta.solana.com',
-  //           // 'https://solana-mainnet.g.alchemy.com/v2/demo',
-  //           // "https://mainnet.helius-rpc.com/?api-key=f1b4cce0-6c11-4435-9440-bed108563d09"
-  //         ];
-
-  //         let solanaConnection;
-  //         let lastError;
-  //         for (const endpoint of solanaRpcEndpoints) {
-  //           try {
-  //             solanaConnection = new Connection(endpoint);
-  //             const mintAccount = new PublicKey(
-  //               "3ag1Mj9AKz9FAkCQ6gAEhpLSX8B2pUbPdkb9iBsDLZNB"
-  //             );
-  //             const accountPublickey = new PublicKey(publicKey?.toString() as any);
-  //             console.log("debug->solanaAccount", accountPublickey);
-  //             const account = await solanaConnection.getTokenAccountsByOwner(accountPublickey, { mint: mintAccount });
-  //             if (account.value.length === 0) {
-  //               setTokenBalance('0');
-  //             } else {
-  //               const balance = await solanaConnection.getTokenAccountBalance(new PublicKey(account.value[0].pubkey.toString()));
-  //               setTokenBalance('' + (balance.value.uiAmount ?? ''));
-  //             }
-  //             // If successful, break out of the loop
-  //             lastError = null;
-  //             break;
-  //           } catch (err) {
-  //             lastError = err;
-  //             // Try next endpoint
-  //           }
-  //         }
-  //         if (lastError) {
-  //           console.error("All Solana RPC endpoints failed:", lastError);
-  //         }
-  //       }
-  //     } catch (e) {
-  //       console.error(e)
-  //     }
-  //   }
-  //   if (fromChain && address) {
-  //     fetchBalance()
-  //   }
-  //   if (isConnected == false)
-  //     return setTokenBalance('0')
-  // }, [fromChain, publicKey, isBridging, isConnected])
-
   useEffect(() => {
     const fetchBalance = async () => {
-      let solanaConnection;
       try {
-        solanaConnection = new Connection("https://mainnet.helius-rpc.com/?api-key=b5064b11-553d-464e-a03d-58198591aa33");
-        const mintAccount = new PublicKey(
-          "3ag1Mj9AKz9FAkCQ6gAEhpLSX8B2pUbPdkb9iBsDLZNB"
-        );
-        const accountPublickey = new PublicKey(publicKey?.toString() as any);
-        const account = await solanaConnection.getTokenAccountsByOwner(accountPublickey, { mint: mintAccount });
-        if (account.value.length === 0) {
-          setTokenBalance('0');
+        const fromChainChains = chains.filter((chain) => chain.id === fromChain)
+        if (fromChainChains.length == 0) return
+        if (fromChain !== solana.id) {
+          // @ts-ignore
+          readContract(config as any, {
+            abi,
+            // @ts-ignore
+            address: TOKENS[fromChain],
+            functionName: 'balanceOf',
+            args: [address],
+            chainId: fromChainChains[0].id
+          }).then(bal => {
+            setTokenBalance(Number(bal) / 10 ** 18)
+          })
         } else {
-          const balance = await solanaConnection.getTokenAccountBalance(new PublicKey(account.value[0].pubkey.toString()));
-          setTokenBalance('' + (balance.value.uiAmount ?? ''));
+          // Enable multiple Solana RPC endpoints for redundancy/failover
+          const solanaRpcEndpoints = [
+            "https://mainnet.helius-rpc.com/?api-key=b5064b11-553d-464e-a03d-58198591aa33",
+            // 'https://mainnet.helius-rpc.com/?api-key=c471ca87-a59f-4c9e-a748-243ed59a55b0',
+            // 'https://api.mainnet-beta.solana.com',
+            // 'https://solana-mainnet.g.alchemy.com/v2/demo',
+            // "https://mainnet.helius-rpc.com/?api-key=f1b4cce0-6c11-4435-9440-bed108563d09"
+          ];
+
+          let solanaConnection;
+          let lastError;
+          for (const endpoint of solanaRpcEndpoints) {
+            try {
+              solanaConnection = new Connection(endpoint);
+              const mintAccount = new PublicKey(
+                "3ag1Mj9AKz9FAkCQ6gAEhpLSX8B2pUbPdkb9iBsDLZNB"
+              );
+              const accountPublickey = new PublicKey(address as any);
+              const account = await solanaConnection.getTokenAccountsByOwner(accountPublickey, { mint: mintAccount });
+              if (account.value.length === 0) {
+                setTokenBalance('0');
+              } else {
+                const balance = await solanaConnection.getTokenAccountBalance(new PublicKey(account.value[0].pubkey.toString()));
+                setTokenBalance('' + (balance.value.uiAmount ?? ''));
+              }
+              // If successful, break out of the loop
+              lastError = null;
+              break;
+            } catch (err) {
+              lastError = err;
+              // Try next endpoint
+            }
+          }
+          if (lastError) {
+            console.error("All Solana RPC endpoints failed:", lastError);
+          }
         }
       } catch (e) {
-        console.error(e);
+        console.error(e)
       }
     }
-    if (publicKey) {
-      fetchBalance();
-    } else {
-      setTokenBalance('0');
+    if (fromChain && address) {
+      fetchBalance()
     }
-  }, [publicKey]);
+    if (isConnected == false)
+      return setTokenBalance('0')
+  }, [fromChain, address, isBridging, isConnected])
 
   return (
     <div /*className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4"*/>
@@ -574,8 +466,7 @@ export default function CrossChainBridge() {
                 {/* Wallet Connection Section */}
                 <div className="space-y-3">
                   <div className="flex gap-3 flex-wrap justify-center">
-                    {/* <appkit-button /> */}
-                    <WalletMultiButtonDynamic />
+                    <appkit-button />
                   </div>
                 </div>
 
