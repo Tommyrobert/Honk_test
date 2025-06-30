@@ -20,7 +20,9 @@ import {
   Keypair,
   Transaction,
   Connection,
-  ComputeBudgetProgram
+  ComputeBudgetProgram,
+  VersionedTransaction,
+  TransactionMessage
 } from '@solana/web3.js'
 import { useAppKitProvider } from '@reown/appkit/react'
 import { type Provider } from '@reown/appkit-adapter-solana/react'
@@ -32,6 +34,7 @@ import { Options } from '@layerzerolabs/lz-v2-utilities'
 import { networks } from "@/config"
 import { useSolanaWallet } from "@/context/solanaWalletProvider"
 import { useWallet } from "@solana/wallet-adapter-react";
+import { get } from "http"
 
 const chains = networks;
 
@@ -57,7 +60,7 @@ export default function CrossChainBridge() {
   const { walletProvider } = useAppKitProvider<Provider>('solana')
   const network = useAppKitNetwork()
 
-  const { publicKey } = useWallet();
+  const { publicKey, sendTransaction, connected } = useWallet();
 
   // console.log("debug->solanapublickey", publicKey, address);
 
@@ -242,7 +245,7 @@ export default function CrossChainBridge() {
         const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
           microLamports: 1
         });
-        const sendTransaction = new Transaction()
+        const transaction = new Transaction()
           .add(modifyComputeUnits)
           .add(addPriorityFee)
           .add(
@@ -267,16 +270,32 @@ export default function CrossChainBridge() {
               ENDPOINT_PROGRAM_ID,
             ),
           )
-        sendTransaction.recentBlockhash = (await connectionT.getLatestBlockhash()).blockhash;
-        sendTransaction.feePayer = payer;
+        transaction.recentBlockhash = (await connectionT.getLatestBlockhash()).blockhash;
+        transaction.feePayer = payer;
         // const tx = await getPhantomAdapter().signTransaction(
         //   sendTransaction
         // );
         // const hash = await connectionT.sendRawTransaction(tx.serialize(), { maxRetries: 3, skipPreflight: true })
-        const rehash = await getPhantomAdapter().signAndSendTransaction(
-          sendTransaction
+
+        const messageV0 = new TransactionMessage({
+          payerKey: payer,
+          recentBlockhash: transaction.recentBlockhash,
+          instructions: transaction.instructions,
+        }).compileToV0Message();
+
+        const versionedTransaction = new VersionedTransaction(messageV0);
+        const { signature } = await getPhantomAdapter().signAndSendTransaction(
+          versionedTransaction  
         );
-        const result = await connectionT.confirmTransaction(rehash)
+
+        // const result = await connectionT.getSignatureStatus(signature);
+
+        // const signature = await sendTransaction(transaction, connectionT);
+        // const confirmation = await connectionT.confirmTransaction(signature, "confirmed");
+        // const rehash = await getPhantomAdapter().signAndSendTransaction(
+        //   sendTransaction
+        // );
+        const result = await connectionT.confirmTransaction(signature)
         if (result.value.err) {
           toast({
             title: "Error",
